@@ -231,6 +231,33 @@ internal class MaestroCommandSerializationTest {
     }
 
     @Test
+    fun `serialize InputTextRandomCommand`() {
+        // given
+        val command = MaestroCommand(
+          InputTextRandomCommand("number", 8)
+        )
+
+        // when
+        val serializedCommandJson = command.toJson()
+        val deserializedCommand = objectMapper.readValue(serializedCommandJson, MaestroCommand::class.java)
+
+        // then
+        @Language("json")
+        val expectedJson = """
+            {
+              "inputTextRandomCommand" : {
+                "inputType" : "number",
+                "lenght" : 8
+              }
+            }
+          """.trimIndent()
+        assertThat(serializedCommandJson)
+            .isEqualTo(expectedJson)
+        assertThat(deserializedCommand)
+            .isEqualTo(command)
+    }
+
+    @Test
     fun `serialize LaunchAppCommand`() {
         // given
         val command = MaestroCommand(

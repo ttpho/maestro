@@ -199,6 +199,57 @@ data class InputTextCommand(
     }
 }
 
+data class InputTextRandomCommand(
+    val inputType: String? = "text",
+    val length: Int? = 8,
+) : Command {
+
+    fun genRamdomString() : String {
+        val finalType = when(inputType) {
+            "number" -> "number"
+            "text" -> "text"
+            else -> "text"
+        }
+        val lengthNonNull = length ?: 8
+        val finalLength = if (lengthNonNull <= ) 8 else lengthNonNull
+
+        if (finalType == "number") return getRandomNumber(finalLength)
+
+        return getRandomText(finalLength)
+    }
+
+    private fun getRandomNumber(length: Int): String {
+        val charset = "0123456789"
+        val charsetWithoutZero = "123456789"
+        val randomNum = (1..length)
+            .map { charset.random() }
+            .joinToString("")
+        return if (randomNum.startsWith("0")) {
+            charsetWithoutZero.random() + randomNum.substring(1)
+        } else randomNum
+
+    }
+
+    private fun getRandomText(length: Int): String {
+        val charset = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz0123456789"
+        return (1..length)
+            .map { charset.random() }
+            .joinToString("")
+    }
+
+    override fun description(): String {
+        return "Input text random $inputType with length $length"
+    }
+
+    override fun injectEnv(env: Map<String, String>): InputTextRandomCommand {
+        return copy(
+            inputType = inputType?.injectEnv(env),
+            length = length?.injectEnv(env)
+        )
+    }
+}
+
+
 data class LaunchAppCommand(
     val appId: String,
     val clearState: Boolean? = null,

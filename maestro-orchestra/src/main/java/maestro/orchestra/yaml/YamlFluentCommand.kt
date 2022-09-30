@@ -30,6 +30,7 @@ import maestro.orchestra.ElementTrait
 import maestro.orchestra.EraseTextCommand
 import maestro.orchestra.HideKeyboardCommand
 import maestro.orchestra.InputTextCommand
+import maestro.orchestra.InputTextRandomCommand
 import maestro.orchestra.LaunchAppCommand
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.OpenLinkCommand
@@ -54,6 +55,7 @@ data class YamlFluentCommand(
     val assertNotVisible: YamlElementSelectorUnion? = null,
     val action: String? = null,
     val inputText: String? = null,
+    val inputTextRandom: YamlInputTextRandom? = null,
     val launchApp: YamlLaunchApp? = null,
     val swipe: YamlElementSelectorUnion? = null,
     val openLink: String? = null,
@@ -75,6 +77,7 @@ data class YamlFluentCommand(
             assertVisible != null -> listOf(MaestroCommand(AssertCommand(visible = toElementSelector(assertVisible))))
             assertNotVisible != null -> listOf(MaestroCommand(AssertCommand(notVisible = toElementSelector(assertNotVisible))))
             inputText != null -> listOf(MaestroCommand(InputTextCommand(inputText)))
+            inputTextRandom != null -> listOf(inputTextRandom(inputTextRandom))
             swipe != null -> listOf(swipeCommand(swipe))
             openLink != null -> listOf(MaestroCommand(OpenLinkCommand(openLink)))
             pressKey != null -> listOf(MaestroCommand(PressKeyCommand(code = KeyCode.getByName(pressKey) ?: throw SyntaxError("Unknown key name: $pressKey"))))
@@ -167,6 +170,13 @@ data class YamlFluentCommand(
                 clearKeychain = command.clearKeychain,
             )
         )
+    }
+
+    private fun inputTextRandom(command: YamlInputTextRandom): MaestroCommand {
+        return MaestroCommand(InputTextRandomCommand(
+            inputType = command.inputType,
+            length = command.length,
+        ),)
     }
 
     private fun tapCommand(
@@ -346,6 +356,10 @@ data class YamlFluentCommand(
 
                 "scroll" -> YamlFluentCommand(
                     action = "scroll"
+                )
+
+                "inputTextRandom" -> YamlFluentCommand(
+                    inputTextRandom = YamlInputTextRandom(inputType = "text", length = 8,)
                 )
 
                 else -> throw SyntaxError("Invalid command: \"$stringCommand\"")
